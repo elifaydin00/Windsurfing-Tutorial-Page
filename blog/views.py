@@ -1,31 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from datetime import date
 
-all_posts=[
-    {"slug":"hike-in-the-mountains",
-    "image:":"mountains.jpg",
-    "author":"Elif",
-    "date": date(2021,8,2),
-    "title": "Mountain Hiking",
-    "excerpt":"The views were amazing while hiking. I will definitely do another hiking session",
-    "content": "Some dummy paragraph blah blah blah blah blah blah blah blah blah blahblah dummy"},
+from .models import Post
 
-    {"slug":"second-post",
-    "image:":"ch.jpg",
-    "author":"Elif",
-    "date": date(2021,11,2),
-    "title": "asdasdasdas",
-    "excerpt":"experimental second post",
-    "content": "Some dummy paragraph blah blah blah blah blah blah blah blah blah blahblah dummy"},
-
-    {"slug":"third-post",
-    "image:":"max.jpg",
-    "author":"Elif",
-    "date": date(2021,10,2),
-    "title": "dasdasdasdasdasdasdasdasd",
-    "excerpt":"experimental third post",
-    "content": "Some dummy paragraph blah blah blah blah blah blah blah blah blah blahblah dummy"}
-]
 
 def get_date(post):
     return post['date']
@@ -33,19 +10,25 @@ def get_date(post):
 # Create your views here.
 
 def starting_page(request):
-    sorted_posts=sorted(all_posts,key=get_date)
-    latest_posts=sorted_posts[-3:]
+    latest_posts=Post.objects.all().order_by("-date")[:3]
+    #sorted_posts=sorted(all_posts,key=get_date)
+    #latest_posts=sorted_posts[-3:]
     return render(request,"blog/index.html",
     {
         "posts":latest_posts
     })
 
 def posts(request):
+    all_posts=Post.objects.all().order_by("-date")
     return render(request,"blog/all-posts.html",
     {
         "all_posts":all_posts
     })
 
 def post_detail(request,slug):
-    return render(request,"blog/post-detail.html")
+    identified_post=get_object_or_404(Post,slug=slug)
+    #identified_post=Post.objects.get(slug=slug)
+    return render(request,"blog/post-detail.html",{
+        "post":identified_post
+    })
 
